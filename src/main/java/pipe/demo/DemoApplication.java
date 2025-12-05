@@ -1,4 +1,4 @@
-package java.pipe.demo;
+package pipe.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

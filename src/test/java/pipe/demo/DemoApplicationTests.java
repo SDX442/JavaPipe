@@ -1,4 +1,4 @@
-package java.pipe.demo;
+package pipe.demo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
