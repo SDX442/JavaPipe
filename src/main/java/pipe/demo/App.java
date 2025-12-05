@@ -1,20 +1,15 @@
 package pipe.demo;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@SpringBootApplication
-@RestController
 public class App {
-
-    public static void main(String[] args) {
-        SpringApplication.run(App.class, args);
+    
+    public int add(int a, int b) {
+        return a + b;
     }
-
-    @GetMapping("/")
-    public String hello() {
-        return "Hello GitHub Actions!";
+    
+    public static void main(String[] args) {
+        App app = new App();
+        System.out.println("=== Simple Calculator ===");
+        System.out.println("10 + 5 = " + app.add(10, 5));
+        System.out.println("20 + 30 = " + app.add(20, 30));
     }
 }

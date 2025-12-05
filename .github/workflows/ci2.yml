@@ -2,76 +2,65 @@ name: Java CI Pipeline
 
 on:
   push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
-      # 1. Checkout repository
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # 2. Set up Java 17
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      # 3. Make mvnw executable (for Linux runners)
-      - name: Make mvnw executable
-        run: chmod +x mvnw
-
-      # 4. Clean, test, and package the app
-      - name: Build with Maven (clean, test, package)
-        run: ./mvnw clean test package -DskipTests=false
-
-      # 5. Upload JAR artifact (use v4!)
-      - name: Upload JAR artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: demo-jar
-          path: target/*.jar
-          if-no-files-found: error
-
-      # 6. DISCORD NOTIFICATION - ADD THIS STEP
-      - name: Discord Notification
-        if: always()  # Send notification for both success and failure
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            TITLE="✅ Build Successful!"
-            COLOR="3066993"  # Green
-            DESCRIPTION="All tests passed! JAR file is ready for download."
-          else
-            TITLE="❌ Build Failed"
-            COLOR="15158332"  # Red
-            DESCRIPTION="Check GitHub Actions logs for details."
-          fi
-          
-          curl -X POST \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"embeds\": [{
-                \"title\": \"$TITLE\",
-                \"description\": \"**Repository:** ${{ github.repository }}\\n**Branch:** ${{ github.ref_name }}\\n**Triggered by:** ${{ github.actor }}\\n**Status:** ${{ job.status }}\\n\\n$DESCRIPTION\",
-                \"color\": $COLOR,
-                \"fields\": [
-                  {
-                    \"name\": \"🔗 View Results\",
-                    \"value\": \"[Click here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\",
-                    \"inline\": true
-                  },
-                  {
-                    \"name\": \"📦 Artifact\",
-                    \"value\": \"JAR file available\",
-                    \"inline\": true
-                  }
-                ],
-                \"footer\": {
-                  \"text\": \"GitHub Actions • $(date -u +'%Y-%m-%d %H:%M:%S UTC')\"
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Java 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    
+    # Just run this ONE command - it does everything
+    - name: Build and Test
+      run: mvn clean verify
+    
+    - name: Upload JAR
+      uses: actions/upload-artifact@v4
+      with:
+        name: spring-boot-app
+        path: target/*.jar
+    
+    # Simple Discord Notification
+    - name: Discord Notification
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          MSG="✅ **Build Successful!**"
+          COLOR="3066993"
+        else
+          MSG="❌ **Build Failed!**"
+          COLOR="15158332"
+        fi
+        
+        curl -X POST \
+          -H "Content-Type: application/json" \
+          -d "{
+            \"embeds\": [{
+              \"title\": \"$MSG\",
+              \"description\": \"**Repo:** ${{ github.repository }}\\n**Branch:** ${{ github.ref_name }}\\n**By:** ${{ github.actor }}\",
+              \"color\": $COLOR,
+              \"fields\": [
+                {
+                  \"name\": \"Status\",
+                  \"value\": \"${{ job.status }}\",
+                  \"inline\": true
+                },
+                {
+                  \"name\": \"View Results\",
+                  \"value\": \"[Click Here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\",
+                  \"inline\": true
                 }
-              }]
-            }" \
-            "${{ secrets.DISCORD_WEBHOOK_URL }}"
+              ]
+            }]
+          }" \
+          "${{ secrets.DISCORD_WEBHOOK_URL }}"
