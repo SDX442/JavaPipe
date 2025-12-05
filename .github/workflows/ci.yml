@@ -20,17 +20,19 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      # 3. Make mvnw executable (Linux fix)
+      # 3. Make mvnw executable (for Linux runners)
       - name: Make mvnw executable
+      # on Windows runner this is a no-op, but CI uses ubuntu-latest by default
         run: chmod +x mvnw
 
-      # 4. Clean, run tests, and package the project
+      # 4. Clean, test, and package the app
       - name: Build with Maven (clean, test, package)
         run: ./mvnw clean test package -DskipTests=false
 
-      # 5. Upload JAR as an artifact
+      # 5. Upload JAR artifact (use v4!)
       - name: Upload JAR artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: demo-jar
           path: target/*.jar
+          if-no-files-found: error
