@@ -7,8 +7,8 @@
     <artifactId>demo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>demo</name>
-    <description>Simple test app</description>
 
+    <!-- ✅ Spring Boot parent (important) -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -28,4 +28,13 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <!-- ✅ This makes the JAR executable -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
