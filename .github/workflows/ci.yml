@@ -13,22 +13,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Install JDK
+      # 2. Set up JDK 17
       - name: Set up JDK 17
+      # also enables Maven cache
         uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: '17'
-          distribution: 'temurin'
+          cache: maven
 
-      # 3. Make mvnw executable (Linux requirement)
-      - name: Make mvnw executable
-        run: chmod +x mvnw
+      # (optional) 3. Show Maven version (debug)
+      - name: Show Maven version
+        run: mvn -v
 
-      # 4. Clean, test, package AND repackage for executable JAR
-      - name: Build Spring Boot executable JAR
-        run: ./mvnw clean test package spring-boot:repackage -DskipTests=false
+      # 4. Build Spring Boot executable JAR with system Maven
+      - name: Build with Maven (clean, test, package, repackage)
+        run: mvn -B -ntp clean test package spring-boot:repackage -DskipTests=false
 
-      # 5. Upload JAR using the new v4 artifact action
+      # 5. Upload the executable JAR
       - name: Upload executable JAR
         uses: actions/upload-artifact@v4
         with:
