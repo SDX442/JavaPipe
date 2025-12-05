@@ -1,0 +1,33 @@
+name: Complete Pipeline
+
+on: push
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 1. Get your code
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    # 2. Setup Java
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+    
+    # 3. Run ALL tests
+    - name: Run tests
+      run: mvn test
+    
+    # 4. Build JAR file
+    - name: Build JAR
+      run: mvn clean package
+    
+    # 5. Save the JAR
+    - name: Upload JAR
+      uses: actions/upload-artifact@v4
+      with:
+        name: application-jar
+        path: target/*.jar
